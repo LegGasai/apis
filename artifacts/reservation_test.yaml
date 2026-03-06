@@ -1,0 +1,29 @@
+apiVersion: scheduling.volcano.sh/v1beta1
+kind: Reservation
+metadata:
+  name: test-reservation
+  namespace: default
+spec:
+  schedulerName: volcano
+  queue: default
+  minAvailable: 1
+  ttl: 600s
+  owners:
+    - object:
+        apiVersion: batch.volcano.sh/v1alpha1
+        kind: Job
+        name: job-1
+        namespace: default
+  tasks:
+    - replicas: 1
+      name: nginx
+      template:
+        spec:
+          containers:
+            - name: nginx
+              image: nginx:latest
+              command: ["sleep", "300"]
+              resources:
+                requests:
+                  cpu: "500m"
+                  memory: "500Mi"

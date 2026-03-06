@@ -1,0 +1,52 @@
+apiVersion: scheduling.volcano.sh/v1beta1
+kind: PodGroup
+metadata:
+  name: test-pg
+  namespace: default
+spec:
+  minMember: 1
+  minResources:
+    cpu: "1000m"
+    memory: "2G"
+  queue: default
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod-1
+  namespace: default
+  annotations:
+    scheduling.k8s.io/group-name: test-pg
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+        limits:
+          cpu: "500m"
+          memory: "1Gi"
+  schedulerName: volcano
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod-2
+  namespace: default
+  annotations:
+    scheduling.k8s.io/group-name: test-pg
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+        limits:
+          cpu: "500m"
+          memory: "1Gi"
+  schedulerName: volcano

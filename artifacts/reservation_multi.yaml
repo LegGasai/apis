@@ -1,0 +1,41 @@
+apiVersion: scheduling.volcano.sh/v1beta1
+kind: Reservation
+metadata:
+  name: complex-reservation
+  namespace: default
+spec:
+  schedulerName: volcano
+  queue: default
+  minAvailable: 3  # 2 nginx + 1 busybox
+  ttl: 600s
+  owners:
+    - labelSelector:
+        matchLabels:
+          volcano.sh/reservation-job: job-multi
+  tasks:
+    - name: nginx
+      replicas: 2
+      template:
+        spec:
+          containers:
+            - name: nginx
+              image: nginx:latest
+              command: ["sleep", "300"]
+              resources:
+                requests:
+                  cpu: "500m"
+                  memory: "500Mi"
+          restartPolicy: Never
+    - name: busybox
+      replicas: 1
+      template:
+        spec:
+          containers:
+            - name: busybox
+              image: busybox:latest
+              command: ["sleep", "300"]
+              resources:
+                requests:
+                  cpu: "250m"
+                  memory: "256Mi"
+          restartPolicy: Never

@@ -1,0 +1,30 @@
+apiVersion: batch.volcano.sh/v1alpha1
+kind: Job
+metadata:
+  name: job-1
+  annotations:
+    scheduling.volcano.sh/target-reservation: test-reservation
+spec:
+  minAvailable: 1
+  schedulerName: volcano
+  queue: default
+  policies:
+    - event: PodEvicted
+      action: RestartJob
+  tasks:
+    - replicas: 1
+      name: nginx
+      policies:
+        - event: TaskCompleted
+          action: CompleteJob
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: nginx
+              image: nginx:latest
+              command: ["sleep", "300"]
+              resources:
+                requests:
+                  cpu: "500m"
+                  memory: "500Mi"

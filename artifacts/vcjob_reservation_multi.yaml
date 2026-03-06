@@ -1,0 +1,42 @@
+apiVersion: batch.volcano.sh/v1alpha1
+kind: Job
+metadata:
+  name: job-multi
+  annotations:
+    scheduling.volcano.sh/target-reservation: complex-reservation
+  labels:
+    volcano.sh/reservation-job: job-multi
+spec:
+  minAvailable: 3
+  schedulerName: volcano
+  queue: default
+  policies:
+    - event: PodEvicted
+      action: RestartJob
+  tasks:
+    - name: busybox
+      replicas: 1
+      template:
+        spec:
+          containers:
+            - name: busybox
+              image: busybox:latest
+              command: ["sleep", "300"]
+              resources:
+                requests:
+                  cpu: "250m"
+                  memory: "256Mi"
+          restartPolicy: Never
+    - name: nginx
+      replicas: 2
+      template:
+        spec:
+          containers:
+            - name: nginx
+              image: nginx:latest
+              command: [ "sleep", "300" ]
+              resources:
+                requests:
+                  cpu: "500m"
+                  memory: "500Mi"
+          restartPolicy: Never
